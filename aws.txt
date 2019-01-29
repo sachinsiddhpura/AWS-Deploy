@@ -1,0 +1,64 @@
+sudo apt-get update
+sudo apt-get install python-pip python-dev libpq-dev postgresql postgresql-contrib nginx
+sudo -u postgres psql
+create database tweet;
+create user sachin with password 'admin123';
+alter role sachin set client_encoding to 'utf8';
+\q
+sudo -H pip install --upgrade pip
+sudo -H pip install virtualenv
+mkdir xyz
+cd xyz
+virtualenv abc
+activate abc
+pip install django gunicorn psycopg2
+vim ~(optional)
+git clone your repo
+sudo ufw allow 8000
+python manage.py runserver 0.0.0.0:8000
+set aws all trafic 0.0.0.0/0
+set allowed host in django project your aws ip address
+
+gunicorn --bind 0.0.0.0:8000 yourproject.wsgi
+deactivate
+sudo vim /etc/systemd/system/gunicorn.service
+
+[Unit]
+Description=gunicorn daemon
+After=network.target
+
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=home/ubuntu/yourpro
+ExecStart=/home/ubuntu/yourpro/env/bin/gunicorn --access-logfile - --workers 3 bind unix:/home/pro.sock pro.wsgi:application
+
+[Install]
+WantedBy=multi-user.target
+:wq
+sudo systemctl start gunicorn
+sudo systemctl enable gunicorn
+sudo systemctl status gunicorn
+
+sudo journalctl -u gunicorn
+sudo systemctl daemon-reload
+sudo systemctl restart gunicorn
+
+sudo vim /etc/nginx/sites-available/pro
+
+
+server [
+	listen 80;
+	server_name your aws ip;
+	
+	location = /favicon.ico { access_log off; log_not_found off; }
+	location /static/{ root /home/ubuntu/pro; }
+	location / { include proxy_params;
+			proxy_params http://unix:/home/ubuntu/pro/pro.sock;}
+]
+
+sudo ln -s /etc/nginx/sites-available/pro /etc/nginx/sites-enabled
+sudo nginx -t
+sudo systemctl restart nginx
+sudo ufw delete allow 'Nginx Full'
+ 
